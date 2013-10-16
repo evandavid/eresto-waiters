@@ -2,6 +2,9 @@ package eresto.co.id;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -22,6 +25,7 @@ import eresto.co.id.model.Users;
 import eresto.co.id.util.ConvertStreamToString;
 import android.os.Bundle;
 import android.os.Handler;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.util.Log;
@@ -31,6 +35,7 @@ import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.Toast;
 
+@SuppressLint("NewApi")
 public class HomeActivity extends Activity {
 	private TableAdapter adapter, adapter2;
 	private final String AVAILABLE = "available";
@@ -66,18 +71,25 @@ public class HomeActivity extends Activity {
 		
 		this.app = Eresto.findById(Eresto.class, (long) 1);
 		this.url = this.app.url()+SUB_URL;
-		  
+		
+		ScheduledExecutorService scheduleTaskExecutor = Executors.newScheduledThreadPool(5);
+		 
+	     scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
+	       public void run() {
+	         getMeja();
+	       }
+	     }, 0, 60, TimeUnit.SECONDS);
 	}
 	
 	@Override
 	protected void onResume(){
 		super.onResume();
 		
-		new Thread(new Runnable() {
-			public void run() {
-				getMeja();
-			} 		
-		}).start();
+//		new Thread(new Runnable() {
+//			public void run() {
+//				getMeja();
+//			} 		
+//		}).start();
 		
 	}
 	
@@ -113,11 +125,13 @@ public class HomeActivity extends Activity {
 						this.available_data[i][1] = arrayobj1.getJSONObject(i).getString("status");
 		        	 }
 		        	 
-		        	 this.busy_data = new String[arrayobj2.length()][3];
+		        	 this.busy_data = new String[arrayobj2.length()][5];
 		        	 for (int i = 0; i < arrayobj2.length(); i++) {
 						this.busy_data[i][0] = arrayobj2.getJSONObject(i).getString("meja_id");
 						this.busy_data[i][1] = arrayobj2.getJSONObject(i).getString("status");
 						this.busy_data[i][2] = arrayobj2.getJSONObject(i).getString("pesanan");
+						this.busy_data[i][3] = arrayobj2.getJSONObject(i).getString("status_antar");
+						this.busy_data[i][4] = arrayobj2.getJSONObject(i).getString("status_jadi");
 		        	 }
 		        	 
 		        	 myHandler.post(updateRunnable);

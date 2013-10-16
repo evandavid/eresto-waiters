@@ -1,6 +1,7 @@
 package eresto.co.id.detail;
 
 import eresto.co.id.HomeActivity;
+import eresto.co.id.MenuActivity;
 import eresto.co.id.R;
 import eresto.co.id.views.CustomTextView;
 import android.os.Bundle;
@@ -13,7 +14,7 @@ import android.content.Intent;
 
 @SuppressWarnings("deprecation")
 public class TabHostActivity extends TabActivity {
-	public static String[][] add_menu;
+	public static String[][] add_menu, antar;
 	public static String pesanan_id = "0";
 	public static String meja_id = "0";
 
@@ -46,7 +47,7 @@ public class TabHostActivity extends TabActivity {
         tab1.setContent(intent);
         
         tab2.setIndicator("Process");
-        Intent intent1 = new Intent(this, ServeActivity.class);
+        Intent intent1 = new Intent(this, ProcessActivity.class);
         intent1.putExtra("name", "review");
 //        intent1.putExtra("cust_name", name);
 //        intent1.putExtra("hp", hp);
@@ -54,18 +55,25 @@ public class TabHostActivity extends TabActivity {
         tab2.setContent(intent1);
         
         tab3.setIndicator("Add Order");
-        Intent intent2 = new Intent(this, ServeActivity.class);
-        intent2.putExtra("name", "review");
-//        intent2.putExtra("cust_name", name);
+        Intent intent2 = new Intent(this, MenuActivity.class);
+        intent2.putExtra("xx", "add");
+        intent2.putExtra("name", "order");
 //        intent2.putExtra("hp", hp);
 //        intent2.putExtra("meja", meja);
         tab3.setContent(intent2);
 
         
         /** Add the tabs  to the TabHost to display. */
+
         tabHost.addTab(tab1);
         tabHost.addTab(tab2);
         tabHost.addTab(tab3);
+        
+        String tmp = getIntent().getStringExtra("xx");
+        if (tmp != null){
+        	if(tmp.equals("refresh"))
+        		tabHost.setCurrentTab(1);
+        }
 	}
 
 	@Override

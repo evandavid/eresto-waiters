@@ -2,6 +2,8 @@ package eresto.co.id.detail;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -16,26 +18,28 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import eresto.co.id.HomeActivity;
 import eresto.co.id.R;
-import eresto.co.id.TabHostMenuActivity;
-import eresto.co.id.R.layout;
-import eresto.co.id.R.menu;
-import eresto.co.id.adapter.MenuAdapter;
 import eresto.co.id.model.Eresto;
+import eresto.co.id.model.Users;
 import eresto.co.id.util.ConvertStreamToString;
 import android.os.Bundle;
 import android.os.Handler;
 import android.app.Activity;
-import android.view.Menu;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
 public class ServeActivity extends Activity {
 	private ServeAdapter adapter;
-	private String type, url;
+	private String type, url, url_save;
 	private String[][] data;
 	private Eresto app;
 	private final String SUB_URL = "/api/v1/pesanan?id=";
+	private final String SAVE_URL = "/api/v1/savedeliver?params=";
+	private ProgressDialog dialog;
 	
 	private final Handler myHandler = new Handler();
     final Runnable updateRunnable = new Runnable() {
@@ -49,6 +53,18 @@ public class ServeActivity extends Activity {
             gagal();
         }
     };
+    
+    final Runnable updateGagalSave = new Runnable() {
+        public void run() {
+            gagalSave();
+        }
+    };
+    
+    final Runnable updateSuksesSave = new Runnable() {
+        public void run() {
+            suksesSave();
+        }
+    };
 	
 
 	@Override
@@ -57,6 +73,7 @@ public class ServeActivity extends Activity {
 		setContentView(R.layout.activity_serve);
 		this.app = Eresto.findById(Eresto.class, (long) 1);
 		this.url = this.app.url()+SUB_URL+TabHostActivity.pesanan_id+".json";
+		this.url_save = this.app.url()+SAVE_URL;
 		type = getIntent().getStringExtra("name");
 	}
 	
@@ -121,7 +138,6 @@ public class ServeActivity extends Activity {
 	}
 	
 	public void sukses(){
-//		TabHostMenuActivity.order = data;
 		adapter = new ServeAdapter(this, data, "order");
         ListView feature = (ListView)findViewById(R.id.listView1);  
         feature.setAdapter(adapter);
@@ -130,6 +146,75 @@ public class ServeActivity extends Activity {
 	public void gagal(){
 		Toast.makeText(this, "Cannot reach server, try again", Toast.LENGTH_SHORT).show();
 		finish();
+	}
+	
+	public static String constructJson(String[][] a){
+		Users u = Users.findById(Users.class, (long) 1);
+		String tmp = "{\"data\":[";
+		for (int i = 0; i < a.length; i++) {
+			tmp = tmp+ "{\"pelayan_id\":\""+u.user_id+"\",\"pesanan_id\":\""+TabHostActivity.pesanan_id+"\",\"status_antar\":\"1\",\"menu_id\":\""+a[i][2]+"\"},";
+		}
+		tmp = tmp.substring(0, tmp.length()-1);
+		tmp = tmp+"]}";
+		return tmp;
+	}
+	
+	public void SavePesanan(View view){
+		if(TabHostActivity.antar != null){
+		if (TabHostActivity.antar.length > 0){
+			dialog = ProgressDialog.show(this, "Save Pesanan", 
+					"Please wait", true);
+			new Thread(new Runnable() {
+				public void run() {
+					String tmp = ServeActivity.constructJson(
+							TabHostActivity.antar);
+					SavePesanan(tmp);
+				} 		
+			}).start();
+		}
+		}
+	}
+	
+	public void SavePesanan(String tmp){
+				
+		HttpClient httpclient = new DefaultHttpClient(); 
+		String tmps = null;
+		try {
+			tmps = this.url_save + URLEncoder.encode(tmp,"UTF-8");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		HttpGet httppost = new HttpGet(tmps);
+    	HttpParams httpParameters = new BasicHttpParams();
+	    int timeoutConnection = 5000;
+	    HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+	    int timeoutSocket = 5000;
+	    HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+        try {                         
+	         HttpResponse response = httpclient.execute(httppost); 
+	         
+	         if (response.getStatusLine().getStatusCode() == 200){
+		        	 myHandler.post(updateSuksesSave);
+	         }
+         } 
+        catch (ClientProtocolException e) {
+        	myHandler.post(updateGagalSave);
+         } 
+        catch (IOException e){         
+          } 
+	}
+	
+	public void suksesSave(){
+		dialog.dismiss();
+		Intent i = new Intent(ServeActivity.this, HomeActivity.class);
+	    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		startActivity(i);
+	}
+	
+	public void gagalSave(){
+		dialog.dismiss();
+		Toast.makeText(this, "Failed to save, try again", Toast.LENGTH_SHORT).show();
 	}
 
 }

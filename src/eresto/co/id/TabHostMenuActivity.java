@@ -45,12 +45,14 @@ public class TabHostMenuActivity extends TabActivity {
         intent.putExtra("name", "order");
         intent.putExtra("cust_name", name);
         intent.putExtra("hp", hp);
+        intent.putExtra("xx", "ddd");
         intent.putExtra("meja", meja);
         tab1.setContent(intent);
         
         tab2.setIndicator("Review Order");
         Intent intent1 = new Intent(this, MenuActivity.class);
         intent1.putExtra("name", "review");
+        intent1.putExtra("xx", "cc");
         intent.putExtra("cust_name", name);
         intent.putExtra("hp", hp);
         intent.putExtra("meja", meja);

@@ -9,6 +9,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Vibrator;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,6 +51,11 @@ public class TableAdapter extends BaseAdapter {
 	    } else {
 	    	gridView = (View) convertView;
 	    }
+			anim = new AlphaAnimation(0.5f, 1.0f);
+			anim.setDuration(500); 
+			anim.setStartOffset(20);
+			anim.setRepeatMode(Animation.REVERSE);
+			anim.setRepeatCount(Animation.INFINITE);
  
 			if (this.data != null){
 				RelativeLayout rl = (RelativeLayout)gridView.findViewById(R.id.bgTable);
@@ -62,7 +68,7 @@ public class TableAdapter extends BaseAdapter {
 					@Override
 					public boolean onLongClick(View v) {
 						selectMenu(position);
-						return false;
+						return true;
 					}
 				};
 				
@@ -90,14 +96,27 @@ public class TableAdapter extends BaseAdapter {
 				
 				if (type.equals("available")){
 					rl.setBackgroundResource(R.drawable.bluebg);
-					anim = new AlphaAnimation(0.5f, 1.0f);
-					anim.setDuration(500); 
-					anim.setStartOffset(20);
-					anim.setRepeatMode(Animation.REVERSE);
-					anim.setRepeatCount(Animation.INFINITE);
-					rl.startAnimation(anim);
 					rl.setOnClickListener(clicked);
 				}else{
+					if (data[position][3].equals("0") && data[position][4].equals("1")){
+						Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+						int dot = 200;      // Length of a Morse Code "dot" in milliseconds
+						int dash = 500;     // Length of a Morse Code "dash" in milliseconds
+						int short_gap = 200;    // Length of Gap Between dots/dashes
+						int medium_gap = 500;   // Length of Gap Between Letters
+						int long_gap = 1000;    // Length of Gap Between Words
+						long[] pattern = {
+						    0,  // Start immediately
+						    dot, short_gap, dot, short_gap, dot,    // s
+						    medium_gap,
+						    dash, short_gap, dash, short_gap, dash, // o
+						    medium_gap,
+						    dot, short_gap, dot, short_gap, dot,    // s
+						    long_gap
+						};
+						v.vibrate(pattern, -1);
+						rl.startAnimation(anim);
+					}
 					rl.setOnLongClickListener(listener);
 					rl.setOnClickListener(busyclicked);
 				}				
@@ -112,7 +131,6 @@ public class TableAdapter extends BaseAdapter {
 		this.meja_id = data[pos][0];
     	String[] list_menu = new String[]{
     	        "New Costumer",
-    	        "Cancel Order",
     	    };
     	
     	android.app.AlertDialog.Builder builder = new AlertDialog.Builder(context);  

@@ -20,6 +20,7 @@ import org.json.JSONObject;
 
 
 import eresto.co.id.adapter.MenuAdapter;
+import eresto.co.id.detail.TabHostActivity;
 import eresto.co.id.model.Eresto;
 import eresto.co.id.model.Users;
 import eresto.co.id.util.ConvertStreamToString;
@@ -47,7 +48,7 @@ public class MenuActivity extends Activity {
 	private CustomEditText filter;
 	public ListView feature;
 	public String[][] data;
-	public String type, url, url_save;
+	public String type, url, url_save, adds, url_save2;
 	private final String SUB_URL = "/api/v1/menu.json";
 	private Eresto app;
 	private final String SAVE_URL = "/api/pesanan/index?params=";
@@ -87,14 +88,19 @@ public class MenuActivity extends Activity {
 		this.app = Eresto.findById(Eresto.class, (long) 1);
 		this.url = this.app.url()+SUB_URL;
 		this.url_save = this.app.url()+SAVE_URL;
+		this.url_save2 = this.app.url()+"/api/pesanan/adds?params=";
+		
+		this.adds = getIntent().getStringExtra("xx");
 		
 		this.type = getIntent().getStringExtra("name");
 		if(type != null){
 			if (type.equals("order")){
+				if (!adds.equals("add")){
 				ImageButton img = (ImageButton)findViewById(R.id.imageButton1);
 				LinearLayout ll = (LinearLayout)findViewById(R.id.line);
 				img.setVisibility(View.GONE);
 				ll.setVisibility(View.GONE);
+				}
 				
 				new Thread(new Runnable() {
 					public void run() {
@@ -238,17 +244,28 @@ public class MenuActivity extends Activity {
 	}
 	
 	public void SavePesanan(View view){
-		if (TabHostMenuActivity.review != null){
+		if (TabHostMenuActivity.review.length > 0){
 			dialog = ProgressDialog.show(this, "Save Pesanan", 
 					"Please wait", true);
-			new Thread(new Runnable() {
-				public void run() {
-					String tmp = MenuActivity.constructJson(
-							TabHostMenuActivity.review, TabHostMenuActivity.name,
-							TabHostMenuActivity.meja,TabHostMenuActivity.hp);
-					SavePesanan(tmp);
-				} 		
-			}).start();
+			if (adds.equals("add"))
+			{
+				new Thread(new Runnable() {
+					public void run() {
+						String tmp = MenuActivity.constructJson2(
+								TabHostMenuActivity.review);
+						SavePesanan(tmp);
+					} 		
+				}).start();
+			}else{
+				new Thread(new Runnable() {
+					public void run() {
+						String tmp = MenuActivity.constructJson(
+								TabHostMenuActivity.review, TabHostMenuActivity.name,
+								TabHostMenuActivity.meja,TabHostMenuActivity.hp);
+						SavePesanan(tmp);
+					} 		
+				}).start();
+			}
 		}
 	}
 	
@@ -257,7 +274,10 @@ public class MenuActivity extends Activity {
 		HttpClient httpclient = new DefaultHttpClient(); 
 		String tmps = null;
 		try {
-			tmps = this.url_save + URLEncoder.encode(tmp,"UTF-8");
+			if (adds.equals("add"))
+				tmps = this.url_save2 + URLEncoder.encode(tmp,"UTF-8");
+			else
+				tmps = this.url_save + URLEncoder.encode(tmp,"UTF-8");
 		} catch (UnsupportedEncodingException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -303,6 +323,18 @@ public class MenuActivity extends Activity {
 		
 		tmp = tmp.substring(0, tmp.length()-1);
 		tmp = tmp+"],\"customer\":\""+name+"\",\"table\":\""+table+"\",\"telp\":\""+hp+"\",\"waiter\":\""+u.user_id+"\"}";
+		
+		return tmp;
+	}
+	
+	public static String constructJson2(String[][] a){
+		String tmp = "{\"data\":[";
+		for (int i = 0; i < a.length; i++) {
+			tmp = tmp+ "{\"menu_id\":\""+a[i][1]+"\",\"qty\":\""+a[i][3]+"\"},";
+		}
+		
+		tmp = tmp.substring(0, tmp.length()-1);
+		tmp = tmp+"],\"pesanan_id\":\""+TabHostActivity.pesanan_id+"\"}";
 		
 		return tmp;
 	}

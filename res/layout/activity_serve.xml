@@ -49,6 +49,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="10dp"
                     android:layout_toLeftOf="@+id/imageButton1"
+                    android:onClick="SavePesanan"
                     android:text="update" />
 
                 <LinearLayout
