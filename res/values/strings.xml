@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Eresto Waiter</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="eresto">eresto</string>
+    <string name="image">TODO</string>
+    <string name="title_activity_ops">OpsActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_setting">SettingActivity</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="ops">Ops, almost there!</string>
+    <string name="opssub">You need to complete application setting by clicking button setting above before continuing.</string>
+    <string name="appsetting">Application setting</string>
+    <string name="title_activity_menu">MenuActivity</string>
+    <string name="filter_menu">Filter Menu</string>
+    <string name="title_activity_tab_host_menu">TabHostMenuActivity</string>
+    <string name="login_with_your_waiter_account">Login with your waiter account</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="title_activity_tab_host">TabHostActivity</string>
+    <string name="title_activity_serve">ServeActivity</string>
+
+</resources>
