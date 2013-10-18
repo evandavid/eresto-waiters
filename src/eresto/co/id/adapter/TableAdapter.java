@@ -100,7 +100,7 @@ public class TableAdapter extends BaseAdapter {
 					rl.setOnClickListener(clicked);
 				}else{
 					for (int i = 0; i < dim.length; i++) {
-						if (dim[i][0].equals(data[position][0]) && dim[0][1].equals("1")){
+						if (dim[i][0].equals(data[position][0]) && dim[i][1].equals("1")){
 							Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
 							int dot = 200;      // Length of a Morse Code "dot" in milliseconds
 							int dash = 500;     // Length of a Morse Code "dash" in milliseconds
