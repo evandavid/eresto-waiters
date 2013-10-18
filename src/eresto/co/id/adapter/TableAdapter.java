@@ -26,16 +26,17 @@ import android.view.animation.Animation;
 
 public class TableAdapter extends BaseAdapter {
 	private Context context;
-	private String[][] data;
+	private String[][] data, dim;
 	private String type, meja_id;
 	private FrameLayout layout_MainMenu;
 	private Animation anim;
 	
 	public eresto.co.id.views.CustomEditText name, phone;
 
-	public TableAdapter(Context context, String[][] data, String type, FrameLayout f) {
+	public TableAdapter(Context context, String[][] data, String type, FrameLayout f, String[][] dim) {
 		this.context = context;
 		this.data = data;
+		this.dim = dim;
 		this.type = type;
 		this.layout_MainMenu = f;
 	}
@@ -98,24 +99,26 @@ public class TableAdapter extends BaseAdapter {
 					rl.setBackgroundResource(R.drawable.bluebg);
 					rl.setOnClickListener(clicked);
 				}else{
-					if (data[position][3].equals("0") && data[position][4].equals("1")){
-						Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-						int dot = 200;      // Length of a Morse Code "dot" in milliseconds
-						int dash = 500;     // Length of a Morse Code "dash" in milliseconds
-						int short_gap = 200;    // Length of Gap Between dots/dashes
-						int medium_gap = 500;   // Length of Gap Between Letters
-						int long_gap = 1000;    // Length of Gap Between Words
-						long[] pattern = {
-						    0,  // Start immediately
-						    dot, short_gap, dot, short_gap, dot,    // s
-						    medium_gap,
-						    dash, short_gap, dash, short_gap, dash, // o
-						    medium_gap,
-						    dot, short_gap, dot, short_gap, dot,    // s
-						    long_gap
-						};
-						v.vibrate(pattern, -1);
-						rl.startAnimation(anim);
+					for (int i = 0; i < dim.length; i++) {
+						if (dim[i][0].equals(data[position][0]) && dim[0][1].equals("1")){
+							Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+							int dot = 200;      // Length of a Morse Code "dot" in milliseconds
+							int dash = 500;     // Length of a Morse Code "dash" in milliseconds
+							int short_gap = 200;    // Length of Gap Between dots/dashes
+							int medium_gap = 500;   // Length of Gap Between Letters
+							int long_gap = 1000;    // Length of Gap Between Words
+							long[] pattern = {
+							    0,  // Start immediately
+							    dot, short_gap, dot, short_gap, dot,    // s
+							    medium_gap,
+							    dash, short_gap, dash, short_gap, dash, // o
+							    medium_gap,
+							    dot, short_gap, dot, short_gap, dot,    // s
+							    long_gap
+							};
+							v.vibrate(pattern, -1);
+							rl.startAnimation(anim);
+						}
 					}
 					rl.setOnLongClickListener(listener);
 					rl.setOnClickListener(busyclicked);

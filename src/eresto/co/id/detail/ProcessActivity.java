@@ -40,7 +40,7 @@ public class ProcessActivity extends Activity {
 	private String url;
 	private String[][] data;
 	private Eresto app;
-	private final String PROCESS_URL = "/api/v1/pesananprocess.json?id=";
+	private final String PROCESS_URL = "/api/v1/pesananprocess?id=";
 	private final String BASE = "/api/v1/cancelpesanan?";
 	
 	@SuppressWarnings("unused")
@@ -75,7 +75,7 @@ public class ProcessActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_process);
 		this.app = Eresto.findById(Eresto.class, (long) 1);
-		this.url = this.app.url()+PROCESS_URL+TabHostActivity.pesanan_id;
+		this.url = this.app.url()+PROCESS_URL+TabHostActivity.pesanan_id+".json";
 		new Thread(new Runnable() {
 			public void run() {
 				getServe();
@@ -92,13 +92,16 @@ public class ProcessActivity extends Activity {
 	public void getServe(){
 		JSONObject object;
 		JSONArray arrayobj1;
-    	HttpClient httpclient = new DefaultHttpClient();    
-    	HttpGet httppost = new HttpGet(this.url);
-    	HttpParams httpParameters = new BasicHttpParams();
+		
+		HttpParams httpParameters = new BasicHttpParams();
 	    int timeoutConnection = 5000;
 	    HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
 	    int timeoutSocket = 5000;
 	    HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+	    
+    	HttpClient httpclient = new DefaultHttpClient(httpParameters);    
+    	HttpGet httppost = new HttpGet(this.url);
+    	
         try {                         
 	         HttpResponse response = httpclient.execute(httppost); 
 	         
@@ -211,24 +214,27 @@ public class ProcessActivity extends Activity {
 	}
 	
 	public void DoCancel(String pesanan_id, String menu_id, String qty){
-		HttpClient httpclient = new DefaultHttpClient();  
+		HttpParams httpParameters = new BasicHttpParams();
+	    int timeoutConnection = 5000;
+	    HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+	    int timeoutSocket = 5000;
+	    HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+	    
+		HttpClient httpclient = new DefaultHttpClient(httpParameters);  
 		String tmp2 = "menu_id="+menu_id+"&pesanan_id="+pesanan_id+"&qty="+qty;
 
 		String tmp = this.app.url()+BASE+ tmp2;
 		Log.v("orm", tmp);
     	HttpGet httppost = new HttpGet(tmp);
-    	HttpParams httpParameters = new BasicHttpParams();
-	    int timeoutConnection = 5000;
-	    HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
-	    int timeoutSocket = 5000;
-	    HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+    	
         try {                         
 	         HttpResponse response = httpclient.execute(httppost); 
 	         
 	         if (response.getStatusLine().getStatusCode() == 200){
 		          	 
 		       myHandler.post(updateCancel);
-	         }
+	         }else
+	        	 myHandler.post(updateCancel2);
          } 
         catch (ClientProtocolException e) {
         	myHandler.post(updateCancel2);

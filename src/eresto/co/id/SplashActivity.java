@@ -56,7 +56,7 @@ public class SplashActivity extends Activity {
 			new Thread(new Runnable() {
     			public void run() {
     				
-    				isConnectedToServer(url, 3500);
+    				isConnectedToServer(url, 5000);
     			} 		
     		}).start();
 		}

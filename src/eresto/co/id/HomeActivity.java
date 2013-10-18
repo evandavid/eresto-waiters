@@ -44,7 +44,7 @@ public class HomeActivity extends Activity {
 	private final String SUB_URL = "/api/v1/meja.json";
 	private Eresto app;
 	private String url;
-	private String[][] busy_data, available_data;
+	private String[][] busy_data, available_data, dim_data;
 	
 	private final Handler myHandler = new Handler();
     final Runnable updateRunnable = new Runnable() {
@@ -85,24 +85,27 @@ public class HomeActivity extends Activity {
 	protected void onResume(){
 		super.onResume();
 		
-//		new Thread(new Runnable() {
-//			public void run() {
-//				getMeja();
-//			} 		
-//		}).start();
+		new Thread(new Runnable() {
+			public void run() {
+				getMeja();
+			} 		
+		}).start();
 		
 	}
 	
 	public void getMeja(){
 		JSONObject object;
-		JSONArray arrayobj1, arrayobj2;
-    	HttpClient httpclient = new DefaultHttpClient();    
-    	HttpGet httppost = new HttpGet(this.url);
-    	HttpParams httpParameters = new BasicHttpParams();
+		JSONArray arrayobj1, arrayobj2, arrayobj3;
+    	
+		HttpParams httpParameters = new BasicHttpParams();
 	    int timeoutConnection = 5000;
 	    HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
 	    int timeoutSocket = 5000;
 	    HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+		
+		HttpClient httpclient = new DefaultHttpClient(httpParameters);    
+    	HttpGet httppost = new HttpGet(this.url);
+    	
         try {                         
 	         HttpResponse response = httpclient.execute(httppost); 
 	         
@@ -118,6 +121,7 @@ public class HomeActivity extends Activity {
 		        	 
 		        	 arrayobj1 = object.getJSONArray("available");
 		        	 arrayobj2 = object.getJSONArray("busy");
+		        	 arrayobj3 = object.getJSONArray("dim");
 		        	 
 		        	 this.available_data = new String[arrayobj1.length()][2];
 		        	 for (int i = 0; i < arrayobj1.length(); i++) {
@@ -125,13 +129,17 @@ public class HomeActivity extends Activity {
 						this.available_data[i][1] = arrayobj1.getJSONObject(i).getString("status");
 		        	 }
 		        	 
-		        	 this.busy_data = new String[arrayobj2.length()][5];
+		        	 this.busy_data = new String[arrayobj2.length()][3];
 		        	 for (int i = 0; i < arrayobj2.length(); i++) {
 						this.busy_data[i][0] = arrayobj2.getJSONObject(i).getString("meja_id");
 						this.busy_data[i][1] = arrayobj2.getJSONObject(i).getString("status");
-						this.busy_data[i][2] = arrayobj2.getJSONObject(i).getString("pesanan");
-						this.busy_data[i][3] = arrayobj2.getJSONObject(i).getString("status_antar");
-						this.busy_data[i][4] = arrayobj2.getJSONObject(i).getString("status_jadi");
+						this.busy_data[i][2] = arrayobj2.getJSONObject(i).getString("pesanan_id");
+		        	 }
+		        	 
+		        	 this.dim_data = new String[arrayobj3.length()][2];
+		        	 for (int i = 0; i < arrayobj3.length(); i++) {
+						this.dim_data[i][0] = arrayobj3.getJSONObject(i).getString("meja_id");
+						this.dim_data[i][1] = arrayobj3.getJSONObject(i).getString("jadi");
 		        	 }
 		        	 
 		        	 myHandler.post(updateRunnable);
@@ -150,11 +158,11 @@ public class HomeActivity extends Activity {
 	}
 	
 	public void sukses(){
-		adapter = new TableAdapter(this, this.busy_data, BUSY, layout_MainMenu);
+		adapter = new TableAdapter(this, this.busy_data, BUSY, layout_MainMenu, this.dim_data);
         GridView feature = (GridView)findViewById(R.id.gridView1);  
         feature.setAdapter(adapter);
         
-        adapter2 = new TableAdapter(this, this.available_data, AVAILABLE, layout_MainMenu);
+        adapter2 = new TableAdapter(this, this.available_data, AVAILABLE, layout_MainMenu, this.dim_data);
         GridView feature2 = (GridView)findViewById(R.id.gridView2);  
         feature2.setAdapter(adapter2);
 	}

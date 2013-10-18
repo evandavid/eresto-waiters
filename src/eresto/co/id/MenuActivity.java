@@ -96,10 +96,10 @@ public class MenuActivity extends Activity {
 		if(type != null){
 			if (type.equals("order")){
 				if (!adds.equals("add")){
-				ImageButton img = (ImageButton)findViewById(R.id.imageButton1);
-				LinearLayout ll = (LinearLayout)findViewById(R.id.line);
-				img.setVisibility(View.GONE);
-				ll.setVisibility(View.GONE);
+					ImageButton img = (ImageButton)findViewById(R.id.imageButton1);
+					LinearLayout ll = (LinearLayout)findViewById(R.id.line);
+					img.setVisibility(View.GONE);
+					ll.setVisibility(View.GONE);
 				}
 				
 				new Thread(new Runnable() {
@@ -144,13 +144,15 @@ public class MenuActivity extends Activity {
 	public void getMenu(){
 		JSONObject object;
 		JSONArray arrayobj1;
-    	HttpClient httpclient = new DefaultHttpClient();    
-    	HttpGet httppost = new HttpGet(this.url);
-    	HttpParams httpParameters = new BasicHttpParams();
+		
+		HttpParams httpParameters = new BasicHttpParams();
 	    int timeoutConnection = 5000;
 	    HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
 	    int timeoutSocket = 5000;
 	    HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+	    
+    	HttpClient httpclient = new DefaultHttpClient(httpParameters);    
+    	HttpGet httppost = new HttpGet(this.url);
         try {                         
 	         HttpResponse response = httpclient.execute(httppost); 
 	         
@@ -176,7 +178,8 @@ public class MenuActivity extends Activity {
 		        	 
 		        	 myHandler.post(updateRunnable);
 		         }
-	         }
+	         }else
+	        	 myHandler.post(updateRunnable2);
          } 
         catch (ClientProtocolException e) {
         	myHandler.post(updateRunnable2);
@@ -270,8 +273,12 @@ public class MenuActivity extends Activity {
 	}
 	
 	public void SavePesanan(String tmp){
-				
-		HttpClient httpclient = new DefaultHttpClient(); 
+		HttpParams httpParameters = new BasicHttpParams();
+	    int timeoutConnection = 5000;
+	    HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+	    int timeoutSocket = 5000;
+	    HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+		HttpClient httpclient = new DefaultHttpClient(httpParameters); 
 		String tmps = null;
 		try {
 			if (adds.equals("add"))
@@ -283,17 +290,14 @@ public class MenuActivity extends Activity {
 			e1.printStackTrace();
 		}
 		HttpGet httppost = new HttpGet(tmps);
-    	HttpParams httpParameters = new BasicHttpParams();
-	    int timeoutConnection = 5000;
-	    HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
-	    int timeoutSocket = 5000;
-	    HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+
         try {                         
 	         HttpResponse response = httpclient.execute(httppost); 
 	         
 	         if (response.getStatusLine().getStatusCode() == 200){
 		        	 myHandler.post(updateSuksesSave);
-	         }
+	         }else
+	        	 myHandler.post(updateGagalSave);
          } 
         catch (ClientProtocolException e) {
         	myHandler.post(updateGagalSave);

@@ -74,7 +74,7 @@ public class LoginActivity extends Activity {
 		}else{
 			dialog = ProgressDialog.show(this, "Logging in", 
 					"Please wait", true);
-			url = app.url()+"/api/v1/login?username="+this.username+"&password="+this.password+".json";
+			url = app.url()+"/api/v1/login.json?username="+this.username+"&password="+this.password+"";
 			Log.v("orm", url);
 			new Thread(new Runnable() {
     			public void run() {
@@ -87,13 +87,16 @@ public class LoginActivity extends Activity {
 	
 	public void doLogin(){
 		JSONObject object;
-    	HttpClient httpclient = new DefaultHttpClient();    
+    	  
     	HttpGet httppost = new HttpGet(url);
+
     	HttpParams httpParameters = new BasicHttpParams();
 	    int timeoutConnection = 5000;
 	    HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
 	    int timeoutSocket = 5000;
 	    HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+		
+	    HttpClient httpclient = new DefaultHttpClient(httpParameters);  
         try {               
 //	         List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);        
 //	
@@ -125,6 +128,8 @@ public class LoginActivity extends Activity {
 		             
 		        	 myHandler.post(updateRunnable);
 		         }
+	         }else{
+	        	 myHandler.post(updateRunnable2); 
 	         }
          } 
         catch (ClientProtocolException e) {

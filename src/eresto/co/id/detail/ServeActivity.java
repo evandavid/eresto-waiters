@@ -93,13 +93,16 @@ public class ServeActivity extends Activity {
 	public void getServe(){
 		JSONObject object;
 		JSONArray arrayobj1;
-    	HttpClient httpclient = new DefaultHttpClient();    
-    	HttpGet httppost = new HttpGet(this.url);
-    	HttpParams httpParameters = new BasicHttpParams();
+		
+		HttpParams httpParameters = new BasicHttpParams();
 	    int timeoutConnection = 5000;
 	    HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
 	    int timeoutSocket = 5000;
 	    HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+		
+    	HttpClient httpclient = new DefaultHttpClient(httpParameters);    
+    	HttpGet httppost = new HttpGet(this.url);
+    	
         try {                         
 	         HttpResponse response = httpclient.execute(httppost); 
 	         
@@ -176,8 +179,13 @@ public class ServeActivity extends Activity {
 	}
 	
 	public void SavePesanan(String tmp){
-				
-		HttpClient httpclient = new DefaultHttpClient(); 
+		HttpParams httpParameters = new BasicHttpParams();
+	    int timeoutConnection = 5000;
+	    HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+	    int timeoutSocket = 5000;
+	    HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+	    
+		HttpClient httpclient = new DefaultHttpClient(httpParameters); 
 		String tmps = null;
 		try {
 			tmps = this.url_save + URLEncoder.encode(tmp,"UTF-8");
@@ -186,17 +194,14 @@ public class ServeActivity extends Activity {
 			e1.printStackTrace();
 		}
 		HttpGet httppost = new HttpGet(tmps);
-    	HttpParams httpParameters = new BasicHttpParams();
-	    int timeoutConnection = 5000;
-	    HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
-	    int timeoutSocket = 5000;
-	    HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+    	
         try {                         
 	         HttpResponse response = httpclient.execute(httppost); 
 	         
 	         if (response.getStatusLine().getStatusCode() == 200){
 		        	 myHandler.post(updateSuksesSave);
-	         }
+	         }else
+	        	 myHandler.post(updateGagalSave);
          } 
         catch (ClientProtocolException e) {
         	myHandler.post(updateGagalSave);
